@@ -33,7 +33,7 @@ impl App {
     /// This function will be called when the user saves a key-value pair in the editor.
     /// It adds the two stored variables to the key-value pairs HashMap,
     /// and resets the status of all of the editing variables.
-    pub fn set_key_value(&mut self) {
+    pub fn save_key_value(&mut self) {
         self.pairs
             .insert(self.key_input.clone(), self.value_input.clone());
 
@@ -79,6 +79,46 @@ impl App {
 
     pub fn currently_editing(&self) -> Option<&CurrentlyEditing> {
         self.currently_editing.as_ref()
+    }
+
+    pub fn set_key_input(&mut self, key_input: String) {
+        self.key_input = key_input;
+    }
+
+    pub fn set_value_input(&mut self, value_input: String) {
+        self.value_input = value_input;
+    }
+
+    pub fn set_pairs(&mut self, pairs: HashMap<String, String>) {
+        self.pairs = pairs;
+    }
+
+    pub fn set_current_screen(&mut self, current_screen: CurrentScreen) {
+        self.current_screen = current_screen;
+    }
+
+    pub fn set_currently_editing(&mut self, currently_editing: Option<CurrentlyEditing>) {
+        self.currently_editing = currently_editing;
+    }
+
+    pub fn pop_key(mut self) -> Self {
+        self.key_input.pop();
+        self
+    }
+
+    pub fn pop_value(mut self) -> Self {
+        self.value_input.pop();
+        self
+    }
+
+    pub fn push_key(mut self, value: char) -> Self {
+        self.key_input.push(value);
+        self
+    }
+
+    pub fn push_value(mut self, value: char) -> Self {
+        self.value_input.push(value);
+        self
     }
 }
 
