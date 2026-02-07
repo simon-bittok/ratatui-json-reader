@@ -1,21 +1,17 @@
-use std::io;
+use std::{error::Error, io};
 
-use crossterm::{
-    event::{self, EnableMouseCapture, Event, KeyCode, KeyEventKind},
-    execute,
-    terminal::{EnterAlternateScreen, enable_raw_mode},
-};
 use json_editor::{App, CurrentScreen, CurrentlyEditing, ui};
 use ratatui::{
     Terminal,
+    backend::{Backend, CrosstermBackend},
     crossterm::{
-        event::DisableMouseCapture,
-        terminal::{LeaveAlternateScreen, disable_raw_mode},
+        event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind},
+        execute,
+        terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
     },
-    prelude::{Backend, CrosstermBackend},
 };
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     // Setup terminal
     enable_raw_mode()?;
     let mut stderr = io::stderr(); // special case; normally using Stdout is just fine
@@ -48,14 +44,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<bool> {
     loop {
-        terminal.draw(|f| ui(f, app))?;
+        terminal.draw(|f| ui(f, app)).map_err(|err| {
+            eprintln!("ERROR: {err:?}");
+            io::Error::new(io::ErrorKind::Other, "Terminal backend error".to_string())
+        })?;
 
         if let Event::Key(key) = event::read()? {
             if key.kind == event::KeyEventKind::Release {
-                // skip events that are not KeyEventKind::Press
+                // Skip events that are not KeyEventKind::Press
                 continue;
             }
-
             match app.current_screen() {
                 CurrentScreen::Main => match key.code {
                     KeyCode::Char('e') => {
@@ -71,7 +69,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     KeyCode::Char('y') => {
                         return Ok(true);
                     }
-                    KeyCode::Char('n') => {
+                    KeyCode::Char('n') | KeyCode::Char('q') => {
                         return Ok(false);
                     }
                     _ => {}

@@ -101,24 +101,20 @@ impl App {
         self.currently_editing = currently_editing;
     }
 
-    pub fn pop_key(mut self) -> Self {
+    pub fn pop_key(&mut self) {
         self.key_input.pop();
-        self
     }
 
-    pub fn pop_value(mut self) -> Self {
+    pub fn pop_value(&mut self) {
         self.value_input.pop();
-        self
     }
 
-    pub fn push_key(mut self, value: char) -> Self {
+    pub fn push_key(&mut self, value: char) {
         self.key_input.push(value);
-        self
     }
 
-    pub fn push_value(mut self, value: char) -> Self {
+    pub fn push_value(&mut self, value: char) {
         self.value_input.push(value);
-        self
     }
 }
 
